@@ -40,8 +40,8 @@ namespace TestListener
             {
                 host.Start();
                 slackout.send(ref breakfastList);
-                System.Threading.Thread.Sleep(15000);
-                //System.Threading.Thread.Sleep(300000);
+                //System.Threading.Thread.Sleep(15000);
+                System.Threading.Thread.Sleep(300000);
                 test.update(ref buuuuList,ref breakfastList);
 
             }
