@@ -48,13 +48,13 @@ namespace TestListener
             //end console result
             foreach(var dev in buuuuList)
             {
-                Console.WriteLine(buuuuList[i]);
+                Console.WriteLine(buuuuList[i].slackname);
                 i++;
             }
             i = 0;
             foreach(var dev in breakfastList)
             {
-                Console.WriteLine(breakfastList[i]);
+                Console.WriteLine(breakfastList[i].slackname);
                 i++;
             }
             Console.ReadLine();
