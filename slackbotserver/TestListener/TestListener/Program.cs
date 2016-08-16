@@ -24,6 +24,8 @@ namespace TestListener
             {
                 UrlReservations = new UrlReservations() { CreateAutomatically = true }
             };
+            String urlWithAccessToken = "https://hooks.slack.com/services/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";
+            SlackSend client = new SlackSend(urlWithAccessToken);
             sendClient slackout = new sendClient();
             slackout.process(1);
             int i = 0;
@@ -32,7 +34,17 @@ namespace TestListener
             var breakfastList = new List<developers>();
             breakfastList.Add(new developers {
                 slackname = "slash",
-                date = "incomplete"
+                lastpay = new date{ day = "04", month = "10", year = "2016"}
+            });
+            breakfastList.Add(new developers
+            {
+                slackname = "dave",
+                lastpay = new date { day = "07", month = "07", year = "2016" }
+            });
+            breakfastList.Add(new developers
+            {
+                slackname = "jooh",
+                lastpay = new date { day = "01", month = "02", year = "2017" }
             });
             using (var host = new NancyHost(new Uri("http://localhost:1234"), new DefaultNancyBootstrapper(), hostConfigs))
             {
@@ -43,21 +55,32 @@ namespace TestListener
                 test.update(ref buuuuList,ref breakfastList);
 
             }
-            //exit message
+            //end of process message
             slackout.process(0);
             //end console result
             foreach(var dev in buuuuList)
             {
-                Console.WriteLine(buuuuList[i].slackname);
+                Console.Write(buuuuList[i].slackname + " ");
+                Console.Write(buuuuList[i].lastpay.day + "/");
+                Console.Write(buuuuList[i].lastpay.month + "/");
+                Console.WriteLine(buuuuList[i].lastpay.year);
                 i++;
             }
             i = 0;
             foreach(var dev in breakfastList)
             {
-                Console.WriteLine(breakfastList[i].slackname);
+                Console.Write(breakfastList[i].slackname + " ");
+                Console.Write(breakfastList[i].lastpay.day + "/");
+                Console.Write(breakfastList[i].lastpay.month + "/");
+                Console.Write(breakfastList[i].lastpay.year);
                 i++;
             }
             Console.ReadLine();
+            //order by dates - whos next to pay
+            //split date string
+            //closing message
+            client.PostMessage(text: "Better luck next time for breky time!",
+                channel: "#general");
         }
     }
     //-------
@@ -117,25 +140,24 @@ namespace TestListener
                     Console.WriteLine("Invalid Token\n Ignored!");
                     return null;
                 }
-                if (model.text.ToLower().StartsWith("testbot: yes"))
+                if (model.text.ToLower().StartsWith("breky yes"))
                 {
                     message = string.Format("@" + model.user_name + " Recieved!");
                     yeslist.Add(new developers
                     {
                         slackname = model.user_name,
-                        date = "inclomplete"
+                        lastpay = {}
                     });
                     Console.WriteLine("'" + message + "' sent back to @" + model.user_name);
                 }
-                if(model.text.ToLower().StartsWith("testbot: no"))
+                if(model.text.ToLower().StartsWith("breky no"))
                 {
                     message = string.Format("@" + model.user_name + " Recieved! removed from this weeks breky list");
                     String name = model.user_name;
                     nolist.Add(new developers
                     {
                         slackname = model.user_name,
-                        date = "incomplete"
-                        
+                        lastpay = {}
                     });
                     Console.WriteLine("'" + message + "' sent back to @" + model.user_name);
                 }
@@ -146,15 +168,63 @@ namespace TestListener
         }
         public void update(ref List<developers> buuuuList, ref List<developers> breakfastList)
         {
+            var tempdevs = new List<developers>();
+            int i = 0;
+            //temp store all the devs
+            foreach (var dev in breakfastList)
+            {
+                tempdevs.Add(breakfastList[i]);
+                i++;
+            }
+
+            //put names into both lists
             buuuuList = nolist;
             breakfastList = yeslist;
-        }
+            //put dates back in for each relevant name
+            for (int a = 0; a < yeslist.Count; a++)
+            {
+                if (breakfastList[a].slackname == yeslist[a].slackname)
+                {
+                    for (int b = 0; b < tempdevs.Count; b++)
+                    {
+                        if (breakfastList[a].slackname == tempdevs[b].slackname)
+                        {
+                            breakfastList[a] = tempdevs[b];
+                        }
+                    }//end foreach
+                }//end if 
+            }//end for , for yes list
+            //sorting no list
+            for (int a = 0; a < nolist.Count; a++)
+            {
+                if (buuuuList[a].slackname == nolist[a].slackname)
+                {
+                    for (int b = 0; b < tempdevs.Count; b++)
+                    {
+                        if (buuuuList[a].slackname == tempdevs[b].slackname)
+                        {
+                            buuuuList[a] = tempdevs[b];
+                        }
+                    }//end foreach
+                }//end if 
+            }//end for , for no list
+
+
+
+        }//end update
     }
     //------
     public class developers
     {
         public string slackname { get; set; }
-        public string date { get; set; }
+        public date lastpay { get; set; }
+    }
+    //------
+    public class date
+    {
+        public string day { get; set; }
+        public string month { get; set; }
+        public string year { get; set; }
     }
     //------
     public class HookMessage
