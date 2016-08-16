@@ -32,6 +32,7 @@ namespace TestListener
             var test = new WebhookModule();
             var buuuuList = new List<developers>();
             var breakfastList = new List<developers>();
+            //adding dev team
             breakfastList.Add(new developers {
                 slackname = "slash",
                 lastpay = new date{ day = "04", month = "10", year = "2016"}
@@ -46,6 +47,7 @@ namespace TestListener
                 slackname = "jooh",
                 lastpay = new date { day = "01", month = "02", year = "2017" }
             });
+            //end of dev team
             using (var host = new NancyHost(new Uri("http://localhost:1234"), new DefaultNancyBootstrapper(), hostConfigs))
             {
                 host.Start();
@@ -77,7 +79,29 @@ namespace TestListener
             }
             Console.ReadLine();
             //order by dates - whos next to pay
-            //split date string
+            i = 0;
+            //temp dev
+            developers lastpayer = new developers();
+            lastpayer = breakfastList[i];
+            foreach(var cooldev in breakfastList)
+            {
+                if (Int32.Parse(lastpayer.lastpay.year) < Int32.Parse(breakfastList[i].lastpay.year))
+                {
+                    if(Int32.Parse(lastpayer.lastpay.month) < Int32.Parse(breakfastList[i].lastpay.month))
+                    {
+                        if(Int32.Parse(lastpayer.lastpay.day) < Int32.Parse(breakfastList[i].lastpay.day))
+                        {
+                            lastpayer = breakfastList[i];
+                        }
+                    }
+                }
+
+                i++;
+            }//end foreach
+            client.PostMessage(text: "It is @" + lastpayer.slackname+ " turn to pay",
+                channel: "#general");
+
+
             //closing message
             client.PostMessage(text: "Better luck next time for breky time!",
                 channel: "#general");
@@ -112,6 +136,7 @@ namespace TestListener
             {
                 client.PostMessage(text: "@" + breakfastList[i].slackname + " can you make it for breakfast",
                        channel: "#general");
+                i++;
             }
 
             return 0;
