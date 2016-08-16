@@ -177,12 +177,22 @@ namespace TestListener
                     channel: "#general");
 
                 //appending the doc sheets 
-                 //spreadsheetId = "1YMLuQ1tJnTJs1FQN0yruMHAS41nIRm1FHT87pP3GCV0";
-                 //range = "Sheet1!A2:D";
-                 //ValueRange test1234 = request.Execute();
-                 //request = service.Spreadsheets.Values.Update();
+                for (i = 0; i < response.Values.Count; i++)
+                {
+                    if ((string)response.Values[1][i] == lastpayer.slackname)
+                    {
+                        response.Values[2][i] = DateTime.Now.ToString("dd/MM/yyyy");
+                    }
+                }
+                
 
-
+                // Define request parameters.
+                String spreadsheetId2 = "1YMLuQ1tJnTJs1FQN0yruMHAS41nIRm1FHT87pP3GCV0";
+                String range2 = "Sheet1!A2:D";
+                SpreadsheetsResource.ValuesResource.UpdateRequest request2 =
+                        service.Spreadsheets.Values.Update(response,spreadsheetId2, range2);
+                //
+                ValueRange response2 = request.Execute();
 
 
             } else
