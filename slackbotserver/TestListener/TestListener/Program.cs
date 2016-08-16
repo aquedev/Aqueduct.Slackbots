@@ -9,12 +9,22 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Net;
 using System.Text;
+using Google.Apis.Auth.OAuth2;
+using Google.Apis.Sheets.v4;
+using Google.Apis.Sheets.v4.Data;
+using Google.Apis.Services;
+using Google.Apis.Util.Store;
+using System.Threading;
+using System.IO;
 
 namespace TestListener
 {
     //----
     class Program
     {
+        static string[] Scopes = { SheetsService.Scope.SpreadsheetsReadonly };
+        static string ApplicationName = "TestListener";
+
         static void Main(string[] args)
         {
             JsConfig.EmitLowercaseUnderscoreNames = true;
@@ -32,21 +42,84 @@ namespace TestListener
             var test = new WebhookModule();
             var buuuuList = new List<developers>();
             var breakfastList = new List<developers>();
+            var datewords = "";
+            String[] done = new String[2];
+            String name = "";
+
+            //access google doc
+            //authenticate
+            //stuff for google docs---------------------------------------------------
+            UserCredential credential;
+
+            using (var stream =
+                new FileStream("client_secret.json", FileMode.Open, FileAccess.Read))
+            {
+                string credPath = System.Environment.GetFolderPath(
+                    System.Environment.SpecialFolder.Personal);
+                credPath = Path.Combine(credPath, ".credentials/sheets.googleapis.com-dotnet-quickstart.json");
+
+                credential = GoogleWebAuthorizationBroker.AuthorizeAsync(
+                    GoogleClientSecrets.Load(stream).Secrets,
+                    Scopes,
+                    "user",
+                    CancellationToken.None,
+                    new FileDataStore(credPath, true)).Result;
+                Console.WriteLine("Credential file saved to: " + credPath);
+            }
+
+            // Create Google Sheets API service.
+            var service = new SheetsService(new BaseClientService.Initializer()
+            {
+                HttpClientInitializer = credential,
+                ApplicationName = ApplicationName,
+            });
+
+            // Define request parameters.
+            String spreadsheetId = "1YMLuQ1tJnTJs1FQN0yruMHAS41nIRm1FHT87pP3GCV0";
+            String range = "Sheet1!A2:D";
+            SpreadsheetsResource.ValuesResource.GetRequest request =
+                    service.Spreadsheets.Values.Get(spreadsheetId, range);
+
+            // Prints the slacknames and paid dates of devs in a spreadsheet:
+            // https://docs.google.com/spreadsheets/d/1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms/edit
+            ValueRange response = request.Execute();
+            IList<IList<Object>> values = response.Values;
+
+
+
+            if (values != null && values.Count > 0)
+            {
+                Console.WriteLine("Name, Date");
+                foreach (var row in values)
+                {
+                    name = (String)row[1];
+                    datewords = (String)row[2];
+                    done = datewords.Split('/');
+                    breakfastList.Add(new developers
+                    {
+                        slackname = name,
+                        lastpay = new date { day = done[0], month = done[1], year = done[2] }
+                    });
+                    // Print columns B and C, which correspond to indices 1 and 2.
+                    Console.WriteLine("{0}, {1}", row[1], row[2]);
+
+
+                }
+            }
+            else
+            {
+                Console.WriteLine("No data found.");
+            }
+            Console.Read();
+           
+
+
+
+
+            //------------------------------------------------------------------------------
             //adding dev team
-            breakfastList.Add(new developers {
-                slackname = "slash",
-                lastpay = new date{ day = "04", month = "10", year = "2016"}
-            });
-            breakfastList.Add(new developers
-            {
-                slackname = "dave",
-                lastpay = new date { day = "07", month = "07", year = "2016" }
-            });
-            breakfastList.Add(new developers
-            {
-                slackname = "jooh",
-                lastpay = new date { day = "01", month = "02", year = "2017" }
-            });
+
+
             //end of dev team
             using (var host = new NancyHost(new Uri("http://localhost:1234"), new DefaultNancyBootstrapper(), hostConfigs))
             {
@@ -82,26 +155,41 @@ namespace TestListener
             i = 0;
             //temp dev
             developers lastpayer = new developers();
-            lastpayer = breakfastList[i];
-            foreach(var cooldev in breakfastList)
+            if (breakfastList.Count != 0)
             {
-                if (Int32.Parse(lastpayer.lastpay.year) < Int32.Parse(breakfastList[i].lastpay.year))
+                lastpayer = breakfastList[i];
+                foreach (var cooldev in breakfastList)
                 {
-                    if(Int32.Parse(lastpayer.lastpay.month) < Int32.Parse(breakfastList[i].lastpay.month))
+                    if (Int32.Parse(lastpayer.lastpay.year) < Int32.Parse(breakfastList[i].lastpay.year))
                     {
-                        if(Int32.Parse(lastpayer.lastpay.day) < Int32.Parse(breakfastList[i].lastpay.day))
+                        if (Int32.Parse(lastpayer.lastpay.month) < Int32.Parse(breakfastList[i].lastpay.month))
                         {
-                            lastpayer = breakfastList[i];
+                            if (Int32.Parse(lastpayer.lastpay.day) < Int32.Parse(breakfastList[i].lastpay.day))
+                            {
+                                lastpayer = breakfastList[i];
+                            }
                         }
                     }
-                }
 
-                i++;
-            }//end foreach
-            client.PostMessage(text: "It is @" + lastpayer.slackname+ " turn to pay",
-                channel: "#general");
+                    i++;
+                }//end foreach
+                client.PostMessage(text: "It is @" + lastpayer.slackname + " turn to pay",
+                    channel: "#general");
+
+                //appending the doc sheets 
+                 //spreadsheetId = "1YMLuQ1tJnTJs1FQN0yruMHAS41nIRm1FHT87pP3GCV0";
+                 //range = "Sheet1!A2:D";
+                 //ValueRange test1234 = request.Execute();
+                 //request = service.Spreadsheets.Values.Update();
 
 
+
+
+            } else
+            {
+                client.PostMessage(text: "no breakky?? :(",
+                    channel: "#general");
+            }
             //closing message
             client.PostMessage(text: "Better luck next time for breky time!",
                 channel: "#general");
