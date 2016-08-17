@@ -16,8 +16,6 @@ using Google.Apis.Services;
 using Google.Apis.Util.Store;
 using System.Threading;
 using System.IO;
-using System.Runtime;
-
 
 namespace TestListener
 {
@@ -86,7 +84,7 @@ namespace TestListener
             ValueRange response = request.Execute();//fetch everything from range(in worksheet : Sheet1, with a range of A2:all of D(should be 14))
             IList<IList<Object>> values = response.Values;//put into indexed list of individualised objects
             //if a list of values has been found
-            if (values != null && values.Count > 0)
+            if (values.Count > 0)
             {
                 //for each person in the list, create a new developer for them and add them to ateending list
                 Console.WriteLine("Name, Date");
