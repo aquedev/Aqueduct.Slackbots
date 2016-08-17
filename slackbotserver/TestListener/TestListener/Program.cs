@@ -22,11 +22,13 @@ namespace TestListener
     //----
     class Program
     {
+        //static variables
         static string[] Scopes = { SheetsService.Scope.Spreadsheets };
         static string ApplicationName = "TestListener";
 
         static void Main(string[] args)
         {
+            //variables
             JsConfig.EmitLowercaseUnderscoreNames = true;
             JsConfig.IncludeNullValues = false;
             JsConfig.PropertyConvention = JsonPropertyConvention.Lenient;
@@ -37,7 +39,6 @@ namespace TestListener
             String urlWithAccessToken = "https://hooks.slack.com/services/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";
             SlackSend client = new SlackSend(urlWithAccessToken);
             sendClient slackout = new sendClient();
-            slackout.process(1);
             int i = 0;
             var test = new WebhookModule();
             var buuuuList = new List<developers>();
@@ -45,19 +46,17 @@ namespace TestListener
             var datewords = "";
             String[] done = new String[2];
             String name = "";
-
-            //access google doc
-            //authenticate
-            //stuff for google docs---------------------------------------------------
             UserCredential credential;
-
+            //start of breakfast process
+            slackout.process(1);
+            //loof for and read credentials for accessing and updating dev table
             using (var stream =
                 new FileStream("client_secret.json", FileMode.Open, FileAccess.Read))
             {
                 string credPath = System.Environment.GetFolderPath(
                     System.Environment.SpecialFolder.Personal);
                 credPath = Path.Combine(credPath, ".credentials/sheets.googleapis.com-dotnet-quickstart.json");
-
+                //credentials for accessing table
                 credential = GoogleWebAuthorizationBroker.AuthorizeAsync(
                     GoogleClientSecrets.Load(stream).Secrets,
                     Scopes,
@@ -82,13 +81,12 @@ namespace TestListener
 
             // Prints the slacknames and paid dates of devs in a spreadsheet:
             // https://docs.google.com/spreadsheets/d/1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms/edit
-            ValueRange response = request.Execute();
-            IList<IList<Object>> values = response.Values;
-
-
-
+            ValueRange response = request.Execute();//fetch everything from range(in worksheet : Sheet1, with a range of A2:all of D(should be 14))
+            IList<IList<Object>> values = response.Values;//put into indexed list of individualised objects
+            //if a list of values has been found
             if (values != null && values.Count > 0)
             {
+                //for each person in the list, create a new developer for them and add them to ateending list
                 Console.WriteLine("Name, Date");
                 foreach (var row in values)
                 {
@@ -102,36 +100,24 @@ namespace TestListener
                     });
                     // Print columns B and C, which correspond to indices 1 and 2.
                     Console.WriteLine("{0}, {1}", row[1], row[2]);
-
-
                 }
             }
             else
-            {
+            {//if nothing was found print to server console that nothing was found. - would be a error
                 Console.WriteLine("No data found.");
             }
-           
-
-
-
-
-            //------------------------------------------------------------------------------
-            //adding dev team
-
-
-            //end of dev team
+            //start listening to channels host
             using (var host = new NancyHost(new Uri("http://localhost:1234"), new DefaultNancyBootstrapper(), hostConfigs))
             {
                 host.Start();
                 slackout.send(ref breakfastList);
-                System.Threading.Thread.Sleep(300000);
-                //System.Threading.Thread.Sleep(3600000);//1 hour
+                //System.Threading.Thread.Sleep(300000);//30 mins
+                System.Threading.Thread.Sleep(3600000);//1 hour
                 test.update(ref buuuuList,ref breakfastList);
-
             }
             //end of process message
             slackout.process(0);
-            //end console result
+            //end server console result of table fetch
             foreach(var dev in buuuuList)
             {
                 Console.Write(buuuuList[i].slackname + " ");
@@ -154,6 +140,7 @@ namespace TestListener
             //temp dev
             developers lastpayer = new developers();
             developers lastpayer2 = new developers(); // incase 2 payers are needed
+            //find last person to pay
             if (breakfastList.Count != 0)
             {
                 lastpayer = breakfastList[i];
@@ -165,14 +152,14 @@ namespace TestListener
                         {
                             if (Int32.Parse(lastpayer.lastpay.day) < Int32.Parse(breakfastList[i].lastpay.day))
                             {
-                                lastpayer = breakfastList[i];
-                                
+                                lastpayer = breakfastList[i];           
                             }
                         }
                     }
-
                     i++;
                 }//end foreach
+                //if there are 10 people or more attending find another person to help pay
+                //the next person would be the next person who would pay
                 if (breakfastList.Count >= 10)
                 {
                     foreach (var otherdev in breakfastList)
@@ -194,6 +181,7 @@ namespace TestListener
                         j++;
                     }//end foreach otherdev
                 }
+                //posting messages to channel on results of proccess
                 client.PostMessage(text: "It is @" + lastpayer.slackname + " turn to pay",
                     channel: "#breakfastmeet");
                 if (!(lastpayer2.slackname == null))
@@ -218,46 +206,40 @@ namespace TestListener
                         }
                     }
                 }
-                
-                //an attempt to update with no api
-                // Define request parameters.
+                //update table with new last pay date of devs who just payed for breakfast
                 String spreadsheetId2 = "1YMLuQ1tJnTJs1FQN0yruMHAS41nIRm1FHT87pP3GCV0";
                 String range2 = "Sheet1!A2:D14";
                 SpreadsheetsResource.ValuesResource.UpdateRequest request2 = 
                     service.Spreadsheets.Values.Update(response,spreadsheetId2, range2);
-                //
-                //ValueRange response2 =
+                ///execute order 666
                 request2.ValueInputOption = SpreadsheetsResource.ValuesResource.UpdateRequest.ValueInputOptionEnum.RAW;
                 request2.Execute();
-
-
             } else
-            {
+            {//if no one wants to go :( 
                 client.PostMessage(text: "no breakky?? :(",
                     channel: "#breakfastmeet");
             }
             //closing message
+            //for those that couldnt make it
             client.PostMessage(text: "Better luck next time for breky time!",
                 channel: "#breakfastmeet");
-            Console.ReadLine();
+            //closes
         }
-       
     }
-    //-------
     //------ sending mesasages
     public class sendClient
     {
         string urlWithAccessToken;
         SlackSend client;
         int i;
-
+        //send client ( kinda obsolute might delete later ?)
         public sendClient()
         {
             urlWithAccessToken = "https://hooks.slack.com/services/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";
             client = new SlackSend(urlWithAccessToken);
         }
         public string step(int step)
-        {
+        {//methods for determining which message to post 
             String message;
             if (step == 1)
                 message = "start";
@@ -269,16 +251,15 @@ namespace TestListener
         {
             i = 0;
             foreach (var dev in breakfastList)
-            {
+            {//method for asking a bunch of people if they can make breakfast
                 client.PostMessage(text: "@" + breakfastList[i].slackname + " can you make it for breakfast \n to reply type 'breaky yes/no'",
                        channel: "@" + breakfastList[i].slackname);
                 i++;
             }
-
             return 0;
         }
         public void process(int part)
-        {
+        {//method for posting which process stage we are at
             String a = step(part);
             client.PostMessage(text: a,
                 channel: "#breakfastmeet");
@@ -287,24 +268,24 @@ namespace TestListener
     //---receiving messages module
     public class WebhookModule : Nancy.NancyModule
     {
+        //list of people as a inbetween list for connewcting main method with this module ( cant ref since its a webhook post method)
         public static List<developers> nolist = new List<developers>();
         public static List<developers> yeslist = new List<developers>();
         public WebhookModule()
-        {
+        {//post mwethod
             Post["/"] = _ =>
             {
                 var model = this.Bind<HookMessage>();
                 var message = string.Empty;
                 Console.WriteLine(model.text.ToLower());
-                if (model.token != "8bRYHHpblrCz5oe9AfhwUTKN") { 
-
+                if (model.token != "8bRYHHpblrCz5oe9AfhwUTKN") { //checks the token of incoming message if found
                     Console.WriteLine("Invalid Token\n Ignored!");
-                    return null;
+                    return null;//ignored if not recognised
                 }
                 if (model.text.ToLower().StartsWith("breaky yes"))
-                {
+                {//if the trigger word was found - written in correct format and response was yes
                     message = string.Format("" + model.user_name + " Recieved! Added to breakfast list");
-                    yeslist.Add(new developers
+                    yeslist.Add(new developers//add them ti yeslist -> goes into breakfastList in update method
                     {
                         slackname = model.user_name,
                         lastpay = {}
@@ -312,17 +293,17 @@ namespace TestListener
                     Console.WriteLine("'" + message + "' sent back to " + model.user_name);
                 }
                 if(model.text.ToLower().StartsWith("breaky no"))
-                {
+                {//if response is no
                     message = string.Format("" + model.user_name + " Recieved! removed from this weeks breky list");
                     String name = model.user_name;
-                    nolist.Add(new developers
+                    nolist.Add(new developers//adds them to nolist -> goes into buuuuList in update method
                     {
                         slackname = model.user_name,
                         lastpay = {}
                     });
                     Console.WriteLine("'" + message + "' sent back to " + model.user_name);
                 }
-                if (!string.IsNullOrWhiteSpace(message))
+                if (!string.IsNullOrWhiteSpace(message))//if message is not empty
                     return new SlackMessage { Text = message, Username = "breaky bot"};
                 return null;
             };
@@ -369,25 +350,22 @@ namespace TestListener
                     }//end foreach
                 }//end if 
             }//end for , for no list
-
-
-
         }//end update
     }
-    //------
+    //------developer var
     public class developers
     {
         public string slackname { get; set; }
         public date lastpay { get; set; }
     }
-    //------
+    //------date var
     public class date
     {
         public string day { get; set; }
         public string month { get; set; }
         public string year { get; set; }
     }
-    //------
+    //------hookmessage var
     public class HookMessage
     {
         public string token { get; set; }
