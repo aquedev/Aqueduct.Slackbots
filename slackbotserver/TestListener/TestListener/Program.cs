@@ -22,7 +22,7 @@ namespace TestListener
     //----
     class Program
     {
-        static string[] Scopes = { SheetsService.Scope.SpreadsheetsReadonly };
+        static string[] Scopes = { SheetsService.Scope.Spreadsheets };
         static string ApplicationName = "TestListener";
 
         static void Main(string[] args)
@@ -34,7 +34,7 @@ namespace TestListener
             {
                 UrlReservations = new UrlReservations() { CreateAutomatically = true }
             };
-            String urlWithAccessToken = "https://hooks.slack.com/services/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";
+            String urlWithAccessToken = "https://hooks.slack.com/services/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";
             SlackSend client = new SlackSend(urlWithAccessToken);
             sendClient slackout = new sendClient();
             slackout.process(1);
@@ -110,7 +110,6 @@ namespace TestListener
             {
                 Console.WriteLine("No data found.");
             }
-            Console.Read();
            
 
 
@@ -125,7 +124,7 @@ namespace TestListener
             {
                 host.Start();
                 slackout.send(ref breakfastList);
-                System.Threading.Thread.Sleep(20000);
+                System.Threading.Thread.Sleep(300000);
                 //System.Threading.Thread.Sleep(3600000);//1 hour
                 test.update(ref buuuuList,ref breakfastList);
 
@@ -150,11 +149,11 @@ namespace TestListener
                 Console.Write(breakfastList[i].lastpay.year);
                 i++;
             }
-            Console.ReadLine();
             //order by dates - whos next to pay
             i = 0;
             //temp dev
             developers lastpayer = new developers();
+            developers lastpayer2 = new developers(); // incase 2 payers are needed
             if (breakfastList.Count != 0)
             {
                 lastpayer = breakfastList[i];
@@ -167,43 +166,80 @@ namespace TestListener
                             if (Int32.Parse(lastpayer.lastpay.day) < Int32.Parse(breakfastList[i].lastpay.day))
                             {
                                 lastpayer = breakfastList[i];
+                                
                             }
                         }
                     }
 
                     i++;
                 }//end foreach
+                if (breakfastList.Count >= 10)
+                {
+                    foreach (var otherdev in breakfastList)
+                    {
+                        int j = 0;
+                        if (Int32.Parse(lastpayer2.lastpay.year) < Int32.Parse(breakfastList[j].lastpay.year))
+                        {
+                            if (Int32.Parse(lastpayer2.lastpay.month) < Int32.Parse(breakfastList[j].lastpay.month))
+                            {
+                                if (Int32.Parse(lastpayer2.lastpay.day) < Int32.Parse(breakfastList[j].lastpay.day))
+                                {
+                                    if (lastpayer.slackname != breakfastList[j].slackname)
+                                    {
+                                        lastpayer2 = breakfastList[j];
+                                    }
+                                }
+                            }
+                        }
+                        j++;
+                    }//end foreach otherdev
+                }
                 client.PostMessage(text: "It is @" + lastpayer.slackname + " turn to pay",
-                    channel: "#general");
-
+                    channel: "#breakfastmeet");
+                if (!(lastpayer2.slackname == null))
+                {
+                    client.PostMessage(text: "and @" + lastpayer2.slackname + " has to pay aswell\n because of too many people!",
+                        channel: "#breakfastmeet");
+                }
                 //appending the doc sheets 
                 for (i = 0; i < response.Values.Count; i++)
                 {
-                    if ((string)response.Values[1][i] == lastpayer.slackname)
+                    if ((string)response.Values[i][1] == lastpayer.slackname)
                     {
-                        response.Values[2][i] = DateTime.Now.ToString("dd/MM/yyyy");
+                        response.Values[i][2] = DateTime.Now.ToString("dd/MM/yyyy");
+                    }
+                    if (lastpayer2.slackname != null || lastpayer2.slackname == "")
+                    {
+                        if((string)response.Values[i][1] == lastpayer2.slackname)
+                        {
+                            response.Values[i][2] = DateTime.Now.ToString("dd/MM/yyyy");
+                        }
                     }
                 }
                 
-
+                //an attempt to update with no api
                 // Define request parameters.
                 String spreadsheetId2 = "1YMLuQ1tJnTJs1FQN0yruMHAS41nIRm1FHT87pP3GCV0";
-                String range2 = "Sheet1!A2:D";
-                SpreadsheetsResource.ValuesResource.UpdateRequest request2 =
-                        service.Spreadsheets.Values.Update(response,spreadsheetId2, range2);
+                String range2 = "Sheet1!A2:D14";
+                SpreadsheetsResource.ValuesResource.UpdateRequest request2 = 
+                    service.Spreadsheets.Values.Update(response,spreadsheetId2, range2);
                 //
-                ValueRange response2 = request.Execute();
+                //ValueRange response2 =
+                request2.ValueInputOption = SpreadsheetsResource.ValuesResource.UpdateRequest.ValueInputOptionEnum.RAW;
+                request2.Execute();
 
 
             } else
             {
                 client.PostMessage(text: "no breakky?? :(",
-                    channel: "#general");
+                    channel: "#breakfastmeet");
             }
             //closing message
             client.PostMessage(text: "Better luck next time for breky time!",
-                channel: "#general");
+                channel: "#breakfastmeet");
+            Console.ReadLine();
         }
+       
     }
     //-------
     //------ sending mesasages
@@ -215,7 +251,7 @@ namespace TestListener
 
         public sendClient()
         {
-            urlWithAccessToken = "https://hooks.slack.com/services/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";
+            urlWithAccessToken = "https://hooks.slack.com/services/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";
             client = new SlackSend(urlWithAccessToken);
         }
         public string step(int step)
@@ -232,8 +268,8 @@ namespace TestListener
             i = 0;
             foreach (var dev in breakfastList)
             {
-                client.PostMessage(text: "@" + breakfastList[i].slackname + " can you make it for breakfast",
-                       channel: "#general");
+                client.PostMessage(text: "@" + breakfastList[i].slackname + " can you make it for breakfast \n to reply type 'breaky yes/no'",
+                       channel: "@" + breakfastList[i].slackname);
                 i++;
             }
 
@@ -243,7 +279,7 @@ namespace TestListener
         {
             String a = step(part);
             client.PostMessage(text: a,
-                channel: "#general");
+                channel: "#breakfastmeet");
         }
     }
     //---receiving messages module
@@ -258,34 +294,34 @@ namespace TestListener
                 var model = this.Bind<HookMessage>();
                 var message = string.Empty;
                 Console.WriteLine(model.text.ToLower());
-                if (model.token != "5jZxYUF2PKJgh9zDnaomRJ0V") { 
+                if (model.token != "8bRYHHpblrCz5oe9AfhwUTKN") { 
 
                     Console.WriteLine("Invalid Token\n Ignored!");
                     return null;
                 }
-                if (model.text.ToLower().StartsWith("breky yes"))
+                if (model.text.ToLower().StartsWith("breaky yes"))
                 {
-                    message = string.Format("@" + model.user_name + " Recieved!");
+                    message = string.Format("" + model.user_name + " Recieved!");
                     yeslist.Add(new developers
                     {
                         slackname = model.user_name,
                         lastpay = {}
                     });
-                    Console.WriteLine("'" + message + "' sent back to @" + model.user_name);
+                    Console.WriteLine("'" + message + "' sent back to " + model.user_name);
                 }
-                if(model.text.ToLower().StartsWith("breky no"))
+                if(model.text.ToLower().StartsWith("breaky no"))
                 {
-                    message = string.Format("@" + model.user_name + " Recieved! removed from this weeks breky list");
+                    message = string.Format("" + model.user_name + " Recieved! removed from this weeks breky list");
                     String name = model.user_name;
                     nolist.Add(new developers
                     {
                         slackname = model.user_name,
                         lastpay = {}
                     });
-                    Console.WriteLine("'" + message + "' sent back to @" + model.user_name);
+                    Console.WriteLine("'" + message + "' sent back to " + model.user_name);
                 }
                 if (!string.IsNullOrWhiteSpace(message))
-                    return new SlackMessage { Text = message, Username = "breky bot"};
+                    return new SlackMessage { Text = message, Username = "breaky bot"};
                 return null;
             };
         }
