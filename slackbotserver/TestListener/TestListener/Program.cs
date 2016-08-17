@@ -19,7 +19,7 @@
     using System.Net;
     using System.Text;
     using System.Threading;
-    
+
     class Program
     {
         // static variables
@@ -81,8 +81,8 @@
 
             // Prints the slacknames and paid dates of devs in a spreadsheet:
             // https://docs.google.com/spreadsheets/d/1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms/edit
-            ValueRange response = request.Execute();//fetch everything from range(in worksheet : Sheet1, with a range of A2:all of D(should be 14))
-            IList<IList<object>> values = response.Values;//put into indexed list of individualised objects
+            ValueRange response = request.Execute();// fetch everything from range(in worksheet : Sheet1, with a range of A2:all of D(should be 14))
+            IList<IList<object>> values = response.Values; // put into indexed list of individualised objects
             // if a list of values has been found
             if (values.Count > 0)
             {
@@ -99,6 +99,7 @@
                         lastpay = new date { day = done[0], month = done[1], year = done[2] }
                     });
                     // Print columns B and C, which correspond to indices 1 and 2.
+
                     Console.WriteLine("{0}, {1}", row[1], row[2]);
                 }
             }
@@ -194,13 +195,13 @@
                     channel: "#breakfastmeet");
                 for (i = 0; i < response.Values.Count; i++)
                 {
-                    if ((string)response.Values[i][1] == lastpayer.slackname)
+                    if (response.Values[i][1].ToString() == lastpayer.slackname)
                     {
                         response.Values[i][2] = DateTime.Now.ToString("dd/MM/yyyy");
                     }
                     if (lastpayer2.slackname != null || lastpayer2.slackname == "")
                     {
-                        if((string)response.Values[i][1] == lastpayer2.slackname)
+                        if(response.Values[i][1].ToString() == lastpayer2.slackname)
                         {
                             response.Values[i][2] = DateTime.Now.ToString("dd/MM/yyyy");
                         }
@@ -288,13 +289,13 @@
                     yeslist.Add(new developers// add them ti yeslist -> goes into breakfastList in update method
                     {
                         slackname = model.user_name,
-                        lastpay = {}
+                        lastpay = { }
                     });
                     Console.WriteLine("'" + message + "' sent back to " + model.user_name);
                 }
                 if(model.text.ToLower().StartsWith("breaky no"))
                 {// if response is no
-                    message = string.Format("" + model.user_name + " Recieved! removed from this weeks breky list");
+                    message = string.Format("@" + model.user_name + " Recieved! removed from this weeks breky list");
                     string name = model.user_name;
                     nolist.Add(new developers// adds them to nolist -> goes into buuuuList in update method
                     {
