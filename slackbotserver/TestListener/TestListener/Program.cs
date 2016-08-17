@@ -202,6 +202,8 @@ namespace TestListener
                         channel: "#breakfastmeet");
                 }
                 //appending the doc sheets 
+                client.PostMessage(text: "there are a total of " + breakfastList.Count + " people attending breakfast!",
+                    channel: "#breakfastmeet");
                 for (i = 0; i < response.Values.Count; i++)
                 {
                     if ((string)response.Values[i][1] == lastpayer.slackname)
@@ -301,7 +303,7 @@ namespace TestListener
                 }
                 if (model.text.ToLower().StartsWith("breaky yes"))
                 {
-                    message = string.Format("" + model.user_name + " Recieved!");
+                    message = string.Format("" + model.user_name + " Recieved! Added to breakfast list");
                     yeslist.Add(new developers
                     {
                         slackname = model.user_name,
