@@ -43,3 +43,5 @@ C:\Users\Hannes Duncan\documents\visual studio 2015\Projects\TestListener\TestLi
 C:\Users\Hannes Duncan\documents\visual studio 2015\Projects\TestListener\TestListener\bin\Debug\log4net.xml
 C:\Users\Hannes Duncan\documents\visual studio 2015\Projects\TestListener\TestListener\bin\Debug\Zlib.Portable.xml
 C:\Users\Hannes Duncan\documents\visual studio 2015\Projects\TestListener\TestListener\bin\Debug\client_secret.json
+C:\Users\Hannes Duncan\documents\visual studio 2015\Projects\TestListener\TestListener\obj\Debug\Interop.VCSharpExtensibilityLib.dll
+C:\Users\Hannes Duncan\documents\visual studio 2015\Projects\TestListener\TestListener\obj\Debug\TestListener.csproj.ResolveComReference.cache
