@@ -1,0 +1,348 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Microsoft.AspNet.WebHooks.Receivers.Slack</name>
+    </assembly>
+    <members>
+        <member name="T:System.Web.Http.HttpConfigurationExtensions">
+            <summary>
+            Extension methods for <see cref="T:System.Web.Http.HttpConfiguration"/>.
+            </summary>
+        </member>
+        <member name="M:System.Web.Http.HttpConfigurationExtensions.InitializeReceiveSlackWebHooks(System.Web.Http.HttpConfiguration)">
+            <summary>
+            Initializes support for receiving Slack WebHooks.
+            A sample WebHook URI is of the form '<c>https://&lt;host&gt;/api/webhooks/incoming/slack/{id}</c>'.
+            For security reasons, the WebHook URI must be an <c>https</c> URI and the WebHook 'token' parameter 
+            must have the same value as configured in the '<c>MS_WebHookReceiverSecret_Slack</c>' application setting.
+            For details about Slack WebHooks, see <c>https://api.slack.com/outgoing-webhooks</c>.
+            </summary>
+            <param name="config">The current <see cref="T:System.Web.Http.HttpConfiguration"/>config.</param>
+        </member>
+        <member name="T:Microsoft.AspNet.WebHooks.Properties.SlackReceiverResources">
+            <summary>
+              A strongly-typed resource class, for looking up localized strings, etc.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNet.WebHooks.Properties.SlackReceiverResources.ResourceManager">
+            <summary>
+              Returns the cached ResourceManager instance used by this class.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNet.WebHooks.Properties.SlackReceiverResources.Culture">
+            <summary>
+              Overrides the current thread's CurrentUICulture property for all
+              resource lookups using this strongly typed resource class.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNet.WebHooks.Properties.SlackReceiverResources.Receiver_BadBody">
+            <summary>
+              Looks up a localized string similar to The HTTP request body did not contain a required &apos;{0}&apos; property indicating a slash command or a &apos;{1}&apos; property indicating an outgoing WebHook..
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNet.WebHooks.Properties.SlackReceiverResources.Receiver_BadToken">
+            <summary>
+              Looks up a localized string similar to The &apos;{0}&apos; parameter provided in the HTTP request did not match the expected value..
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNet.WebHooks.Properties.SlackReceiverResources.Receiver_CommandNameInvalid">
+            <summary>
+              Looks up a localized string similar to Parameter name cannot contain &apos;;&apos; characters: ({0})..
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNet.WebHooks.Properties.SlackReceiverResources.Receiver_CommandNameQuotedString">
+            <summary>
+              Looks up a localized string similar to Parameter name cannot be a quoted string: ({0})..
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNet.WebHooks.Properties.SlackReceiverResources.Receiver_CommandUnmatchedQuote">
+            <summary>
+              Looks up a localized string similar to Unmatched quote ({0}) discovered at position {1}..
+            </summary>
+        </member>
+        <member name="T:Microsoft.AspNet.WebHooks.ParameterCollection">
+            <summary>
+            This version of <see cref="T:System.Collections.Specialized.NameValueCollection"/> creates the output supported by <see cref="M:Microsoft.AspNet.WebHooks.SlackCommand.ParseActionWithParameters(System.String)"/>
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNet.WebHooks.ParameterCollection.ToString">
+            <inheritdoc />
+        </member>
+        <member name="T:Microsoft.AspNet.WebHooks.SlackCommand">
+            <summary>
+             The <see cref="T:Microsoft.AspNet.WebHooks.SlackCommand"/> class provides mechanisms for parsing the text contained in
+             Slack slash commands and outgoing WebHooks following a variety of different formats enabling
+             different scenarios. 
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNet.WebHooks.SlackCommand.ParseActionWithValue(System.String)">
+            <summary>
+            Parses the 'text' of a slash command or 'subtext' of an outgoing WebHook of the form '<c>action value</c>'.
+            </summary>
+            <example>
+            An example of an outgoing WebHook or slash command using this format is '/assistant query what's the weather?'
+            where '/assistant' is the trigger word or slash command, 'query' is the action and 'what's the weather?' is the value.
+            </example>
+            <param name="text">The 'text' of a slash command or 'subtext' of an outgoing WebHook.</param>
+        </member>
+        <member name="M:Microsoft.AspNet.WebHooks.SlackCommand.ParseActionWithParameters(System.String)">
+            <summary>
+            Parses the 'text' of a slash command or 'subtext' of an outgoing WebHook of the form 
+            '<c>action param1; param2=value2; param3=value 3; param4="quoted value4"; ...</c>'.
+            Parameter values containing semi-colons can either escape the semi-colon using a backslash character, 
+            i.e '\;', or quote the value using single quotes or double quotes. 
+            </summary>
+            <example>
+            An example of an outgoing WebHook or slash command using this format is 
+            <c>/appointment add title=doctor visit; time=Feb 3 2016 2 PM; location=Children's Hospital</c> 
+            where '/appointment' is the trigger word or slash command, 'add' is the action and title, time, and location 
+            are parameters.
+            </example>
+            <param name="text">The 'text' of a slash command or 'subtext' of an outgoing WebHook.</param>
+        </member>
+        <member name="M:Microsoft.AspNet.WebHooks.SlackCommand.ValidateParameterName(System.String)">
+            <summary>
+            Verify that parameter name is not a quoted string and that it doesn't contain ';'.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNet.WebHooks.SlackCommand.EncodeNonSeparatorCharacters(System.String)">
+            <summary>
+            Transform quoted or escaped ';' characters so that we can split the stream on actual
+            parameter separators.
+            </summary>
+        </member>
+        <member name="T:Microsoft.AspNet.WebHooks.SlackField">
+            <summary>
+            The <see cref="T:Microsoft.AspNet.WebHooks.SlackField"/> class is used for expression table fields as part of a <see cref="T:Microsoft.AspNet.WebHooks.SlackAttachment"/>,
+            please see <c>https://api.slack.com/docs/attachments</c> for details. Fields are displayed in a table inside the message 
+            attachment.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNet.WebHooks.SlackField.#ctor(System.String,System.String)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.AspNet.WebHooks.SlackField"/> with the given <paramref name="title"/>
+            and <paramref name="value"/>. 
+            </summary>
+            <param name="title">The field title shown as a bold heading above the value text. It cannot contain markup and will be escaped
+            by the receiver.</param>
+            <param name="value">The field value which may contain Markdown-style formatting as described in <c>https://api.slack.com/docs/formatting</c>. 
+            The value may be multi-line and must be escaped following Markdown rules.</param>
+        </member>
+        <member name="M:Microsoft.AspNet.WebHooks.SlackField.#ctor">
+            <summary>
+            Default constructor for serialization purposes
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNet.WebHooks.SlackField.Title">
+            <summary>
+            Gets or sets the field title shown as a bold heading above the value text. It cannot contain markup and will be escaped
+            by the receiver.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNet.WebHooks.SlackField.Value">
+            <summary>
+            Gets or sets the field value. It may contain Markdown-style formatting as described in <c>https://api.slack.com/docs/formatting</c>. 
+            The value may be multi-line and must be escaped following Markdown rules.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNet.WebHooks.SlackField.Short">
+            <summary>
+            Gets or sets a value indicating whether the field is short enough to be displayed side-by-side with other fields.
+            </summary>
+        </member>
+        <member name="T:Microsoft.AspNet.WebHooks.SlackAttachment">
+            <summary>
+             The <see cref="T:Microsoft.AspNet.WebHooks.SlackAttachment"/> is used to describe the contents of an <see cref="T:Microsoft.AspNet.WebHooks.SlackSlashResponse"/>.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNet.WebHooks.SlackAttachment.#ctor(System.String,System.String)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.AspNet.WebHooks.SlackAttachment"/> class with the given
+            <paramref name="text"/> and <paramref name="fallback"/>.
+            </summary>
+            <param name="text">The main text in a message attachment. The text may contain Markdown-style formatting 
+            as described in <c>https://api.slack.com/docs/formatting</c>. The contents will automatically be collapsed 
+            if it contains more than 700 characters or more than 5 line breaks. In this case it will be displayed with 
+            a <c>"Show more..."</c> link to the contents.
+            </param>
+            <param name="fallback">A plain-text summary of the attachment which will be used in clients 
+            that don't show formatted text (e.g. IRC, mobile notifications). It should not contain any markup.</param>
+        </member>
+        <member name="M:Microsoft.AspNet.WebHooks.SlackAttachment.#ctor">
+            <summary>
+            Default constructor for serialization purposes
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNet.WebHooks.SlackAttachment.Fallback">
+            <summary>
+            Gets or sets a required plain-text summary of the attachment. This text will be used in clients 
+            that don't show formatted text (e.g. IRC, mobile notifications) and should not contain 
+            any markup.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNet.WebHooks.SlackAttachment.Color">
+            <summary>
+            Gets or sets an optional value that can either be one of <c>good</c>, <c>warning</c>, <c>danger</c>, 
+            or any hex color code (e.g. <c>#439FE0</c>). This value is used to color the border along the left side 
+            of the message attachment.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNet.WebHooks.SlackAttachment.Pretext">
+            <summary>
+            Gets or sets an optional text that appears above the message attachment block.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNet.WebHooks.SlackAttachment.AuthorName">
+            <summary>
+            Gets or sets an optional small text used to display the author's name.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNet.WebHooks.SlackAttachment.AuthorLink">
+            <summary>
+            Gets or sets a URI that will show up as a hyper link for the <see cref="P:Microsoft.AspNet.WebHooks.SlackAttachment.AuthorName"/> text. This will only be applied 
+            if <see cref="P:Microsoft.AspNet.WebHooks.SlackAttachment.AuthorName"/> is present.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNet.WebHooks.SlackAttachment.AuthorIcon">
+            <summary>
+            Gets or sets a URI that display a small 16x16 pixel image to the left of the <see cref="P:Microsoft.AspNet.WebHooks.SlackAttachment.AuthorName"/> text. This will only 
+            be applied if <see cref="P:Microsoft.AspNet.WebHooks.SlackAttachment.AuthorName"/> is present.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNet.WebHooks.SlackAttachment.Title">
+            <summary>
+            Gets or sets an optional title which is displayed as larger, bold text near the top of a message attachment. 
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNet.WebHooks.SlackAttachment.TitleLink">
+            <summary>
+            Gets or sets a hyper link for the <see cref="P:Microsoft.AspNet.WebHooks.SlackAttachment.Title"/> text. This will only be applied if  
+            <see cref="P:Microsoft.AspNet.WebHooks.SlackAttachment.Title"/> is present.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNet.WebHooks.SlackAttachment.Text">
+            <summary>
+            Gets or sets the main text in a message attachment. The text may contain Markdown-style formatting as described in <c>https://api.slack.com/docs/formatting</c>. 
+            The contents will automatically be collapsed if it contains more than 700 characters or more than 5 line breaks. In this case it will be displayed with a 
+            <c>"Show more..."</c> link to the contents.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNet.WebHooks.SlackAttachment.ImageLink">
+            <summary>
+            Gets or a URI to an image that will be displayed inside a message attachment. Currently supported formats include GIF, JPEG, PNG, and BMP.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNet.WebHooks.SlackAttachment.ThumbLink">
+            <summary>
+            Gets or a URI to an image that will be displayed as a thumbnail on the right side of a message attachment. Currently supported formats 
+            include GIF, JPEG, PNG, and BMP.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNet.WebHooks.SlackAttachment.Fields">
+            <summary>
+            Gets a set of <see cref="T:Microsoft.AspNet.WebHooks.SlackField"/> instances that will be displayed in a table inside the message attachment
+            </summary>
+        </member>
+        <member name="T:Microsoft.AspNet.WebHooks.SlackSlashResponse">
+            <summary>
+             An <see cref="T:Microsoft.AspNet.WebHooks.IWebHookHandler"/> can post a response to a Slack Slash request by updating the
+             <see cref="T:System.Net.Http.HttpResponseMessage"/> on the <see cref="T:Microsoft.AspNet.WebHooks.WebHookHandlerContext"/> with a response
+             containing a <see cref="T:Microsoft.AspNet.WebHooks.SlackSlashResponse"/>. Please see <c>https://api.slack.com/docs/attachments#message_formatting</c> 
+             for additional details.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNet.WebHooks.SlackSlashResponse.#ctor(System.String)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.AspNet.WebHooks.SlackSlashResponse"/> class with the given <paramref name="text"/>. 
+            </summary>
+            <param name="text">The Slack Slash command response text. The text may contain Markdown-style formatting 
+            as described in <c>https://api.slack.com/docs/formatting</c>. The contents will automatically be collapsed 
+            if it contains more than 700 characters or more than 5 line breaks. In this case it will be displayed with 
+            a <c>"Show more..."</c> link to the contents.
+            </param>
+        </member>
+        <member name="M:Microsoft.AspNet.WebHooks.SlackSlashResponse.#ctor(System.String,Microsoft.AspNet.WebHooks.SlackAttachment[])">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.AspNet.WebHooks.SlackSlashResponse"/> class with the given <paramref name="text"/> and 
+            one or more <see cref="T:Microsoft.AspNet.WebHooks.SlackAttachment"/> instances for additional response information. Please see 
+            <see cref="T:Microsoft.AspNet.WebHooks.SlackAttachment"/> for all the options available.
+            </summary>
+            <param name="text">The Slack Slash command response text. The text may contain Markdown-style formatting 
+            as described in <c>https://api.slack.com/docs/formatting</c>. The contents will automatically be collapsed 
+            if it contains more than 700 characters or more than 5 line breaks. In this case it will be displayed with 
+            a <c>"Show more..."</c> link to the contents.
+            </param>
+            <param name="attachments">One or more <see cref="T:Microsoft.AspNet.WebHooks.SlackAttachment"/> instances providing additional response information.
+            Please see <see cref="T:Microsoft.AspNet.WebHooks.SlackAttachment"/> for all the options available.</param>
+        </member>
+        <member name="M:Microsoft.AspNet.WebHooks.SlackSlashResponse.#ctor">
+            <summary>
+            Default constructor for serialization purposes
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNet.WebHooks.SlackSlashResponse.Text">
+            <summary>
+            Gets or sets the Slack Slash Response text. 
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNet.WebHooks.SlackSlashResponse.ResponseType">
+            <summary>
+            Gets or sets the Slack Slash Response type. This value must be either <c>in_channel</c> or <c>ephemeral</c>.
+            If <c>in_channel</c> then both the response message and the initial message typed by the user will be shared in the channel.
+            If <c>ephemeral</c> (default) then the response message will be visible only to the user that issued the command.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNet.WebHooks.SlackSlashResponse.Attachments">
+            <summary>
+            Gets a set of <see cref="T:Microsoft.AspNet.WebHooks.SlackAttachment"/> instances that will comprise the Slack Slash response.
+            </summary>
+        </member>
+        <member name="T:Microsoft.AspNet.WebHooks.SlackResponse">
+            <summary>
+             An <see cref="T:Microsoft.AspNet.WebHooks.IWebHookHandler"/> can post back a response to a Slack channel by updating the
+             <see cref="T:System.Net.Http.HttpResponseMessage"/> on the <see cref="T:Microsoft.AspNet.WebHooks.WebHookHandlerContext"/> with a response
+             containing a <see cref="T:Microsoft.AspNet.WebHooks.SlackResponse"/>.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNet.WebHooks.SlackResponse.#ctor(System.String)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.AspNet.WebHooks.SlackResponse"/> with a given text to post
+            to the Slack channel from which the WebHook were received.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNet.WebHooks.SlackResponse.Text">
+            <summary>
+            Gets or sets the text to send to Slack in response to an incoming WebHook request. 
+            </summary>
+        </member>
+        <member name="T:Microsoft.AspNet.WebHooks.SlackWebHookReceiver">
+            <summary>
+            Provides an <see cref="T:Microsoft.AspNet.WebHooks.IWebHookReceiver"/> implementation which supports WebHooks generated by Slack. 
+            A sample WebHook URI is of the form '<c>https://&lt;host&gt;/api/webhooks/incoming/slack/{id}</c>'.
+            For security reasons, the WebHook URI must be an <c>https</c> URI and the WebHook 'token' parameter 
+            must have the same value as configured in the '<c>MS_WebHookReceiverSecret_Slack</c>' application setting.
+            For details about Slack WebHooks, see <c>https://api.slack.com/outgoing-webhooks</c>.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNet.WebHooks.SlackWebHookReceiver.ReceiverName">
+            <summary>
+            Gets the receiver name for this receiver.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNet.WebHooks.SlackWebHookReceiver.Name">
+            <inheritdoc />
+        </member>
+        <member name="M:Microsoft.AspNet.WebHooks.SlackWebHookReceiver.ReceiveAsync(System.String,System.Web.Http.Controllers.HttpRequestContext,System.Net.Http.HttpRequestMessage)">
+            <inheritdoc />
+        </member>
+        <member name="M:Microsoft.AspNet.WebHooks.SlackWebHookReceiver.GetSubtext(System.String,System.String)">
+            <summary>
+            The 'text' parameter provided by Slack contains both the trigger and the rest of the phrase. This 
+            isolates just the rest of the phrase making it easier to get in handlers.
+            </summary>
+            <param name="trigger">The word triggering this Slack WebHook</param>
+            <param name="text">The full text containing the trigger word.</param>
+            <returns>The subtext without the trigger word.</returns>
+        </member>
+    </members>
+</doc>

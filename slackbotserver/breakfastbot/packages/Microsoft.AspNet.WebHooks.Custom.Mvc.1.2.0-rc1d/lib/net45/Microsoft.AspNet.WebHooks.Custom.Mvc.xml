@@ -1,0 +1,170 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Microsoft.AspNet.WebHooks.Custom.Mvc</name>
+    </assembly>
+    <members>
+        <member name="T:System.Web.Mvc.ControllerExtensions">
+            <summary>
+            Various extension methods for the ASP.NET MVC <see cref="T:System.Web.Mvc.Controller"/> class.
+            </summary>
+        </member>
+        <member name="M:System.Web.Mvc.ControllerExtensions.NotifyAsync(System.Web.Mvc.Controller,System.String,System.Object)">
+            <summary>
+            Submits a notification to all matching registered WebHooks. To match, the <see cref="T:Microsoft.AspNet.WebHooks.WebHook"/> must be registered by the
+            current <see cref="P:System.Web.Mvc.Controller.User"/> and have a filter that matches one or more of the actions provided for the notification.
+            </summary>
+            <param name="controller">The MVC <see cref="T:System.Web.Mvc.Controller"/> instance.</param>
+            <param name="action">The action describing the notification.</param>
+            <param name="data">Optional additional data to include in the WebHook request.</param>
+            <returns>The number of <see cref="T:Microsoft.AspNet.WebHooks.WebHook"/> instances that were selected and subsequently notified about the actions.</returns>
+        </member>
+        <member name="M:System.Web.Mvc.ControllerExtensions.NotifyAsync(System.Web.Mvc.Controller,System.String,System.Object,System.Func{Microsoft.AspNet.WebHooks.WebHook,System.String,System.Boolean})">
+            <summary>
+            Submits a notification to all matching registered WebHooks. To match, the <see cref="T:Microsoft.AspNet.WebHooks.WebHook"/> must be registered by the
+            current <see cref="P:System.Web.Mvc.Controller.User"/> and have a filter that matches one or more of the actions provided for the notification.
+            </summary>
+            <param name="controller">The MVC <see cref="T:System.Web.Mvc.Controller"/> instance.</param>
+            <param name="action">The action describing the notification.</param>
+            <param name="data">Optional additional data to include in the WebHook request.</param>
+            <param name="predicate">A function to test each <see cref="T:Microsoft.AspNet.WebHooks.WebHook"/> to see whether it fulfills the condition. The
+            predicate is passed the <see cref="T:Microsoft.AspNet.WebHooks.WebHook"/> and the user who registered it. If the predicate returns <c>true</c> then
+            the <see cref="T:Microsoft.AspNet.WebHooks.WebHook"/> is included; otherwise it is not.</param>
+            <returns>The number of <see cref="T:Microsoft.AspNet.WebHooks.WebHook"/> instances that were selected and subsequently notified about the actions.</returns>
+        </member>
+        <member name="M:System.Web.Mvc.ControllerExtensions.NotifyAsync(System.Web.Mvc.Controller,Microsoft.AspNet.WebHooks.NotificationDictionary[])">
+            <summary>
+            Submits a notification to all matching registered WebHooks. To match, the <see cref="T:Microsoft.AspNet.WebHooks.WebHook"/> must be registered by the
+            current <see cref="P:System.Web.Mvc.Controller.User"/> and have a filter that matches one or more of the actions provided for the notification.
+            </summary>
+            <param name="controller">The MVC <see cref="T:System.Web.Mvc.Controller"/> instance.</param>
+            <param name="notifications">The set of notifications to include in the WebHook.</param>
+            <returns>The number of <see cref="T:Microsoft.AspNet.WebHooks.WebHook"/> instances that were selected and subsequently notified about the actions.</returns>
+        </member>
+        <member name="M:System.Web.Mvc.ControllerExtensions.NotifyAsync(System.Web.Mvc.Controller,System.Collections.Generic.IEnumerable{Microsoft.AspNet.WebHooks.NotificationDictionary},System.Func{Microsoft.AspNet.WebHooks.WebHook,System.String,System.Boolean})">
+            <summary>
+            Submits a notification to all matching registered WebHooks. To match, the <see cref="T:Microsoft.AspNet.WebHooks.WebHook"/> must be registered by the
+            current <see cref="P:System.Web.Mvc.Controller.User"/> and have a filter that matches one or more of the actions provided for the notification.
+            </summary>
+            <param name="controller">The MVC <see cref="T:System.Web.Mvc.Controller"/> instance.</param>
+            <param name="notifications">The set of notifications to include in the WebHook.</param>
+            <param name="predicate">A function to test each <see cref="T:Microsoft.AspNet.WebHooks.WebHook"/> to see whether it fulfills the condition. The
+            predicate is passed the <see cref="T:Microsoft.AspNet.WebHooks.WebHook"/> and the user who registered it. If the predicate returns <c>true</c> then
+            the <see cref="T:Microsoft.AspNet.WebHooks.WebHook"/> is included; otherwise it is not.</param>
+            <returns>The number of <see cref="T:Microsoft.AspNet.WebHooks.WebHook"/> instances that were selected and subsequently notified about the actions.</returns>
+        </member>
+        <member name="M:System.Web.Mvc.ControllerExtensions.NotifyAllAsync(System.Web.Mvc.Controller,System.String,System.Object)">
+            <summary>
+            Submits a notification to all matching registered WebHooks across all users. To match, the <see cref="T:Microsoft.AspNet.WebHooks.WebHook"/> must 
+            have a filter that matches one or more of the actions provided for the notification.
+            </summary>
+            <param name="controller">The <see cref="T:System.Web.Mvc.Controller"/> instance.</param>
+            <param name="action">The action describing the notification.</param>
+            <param name="data">Optional additional data to include in the WebHook request.</param>
+            <returns>The number of <see cref="T:Microsoft.AspNet.WebHooks.WebHook"/> instances that were selected and subsequently notified about the actions.</returns>
+        </member>
+        <member name="M:System.Web.Mvc.ControllerExtensions.NotifyAllAsync(System.Web.Mvc.Controller,System.String,System.Object,System.Func{Microsoft.AspNet.WebHooks.WebHook,System.String,System.Boolean})">
+            <summary>
+            Submits a notification to all matching registered WebHooks across all users. To match, the <see cref="T:Microsoft.AspNet.WebHooks.WebHook"/> must 
+            have a filter that matches one or more of the actions provided for the notification.
+            </summary>
+            <param name="controller">The <see cref="T:System.Web.Mvc.Controller"/> instance.</param>
+            <param name="action">The action describing the notification.</param>
+            <param name="data">Optional additional data to include in the WebHook request.</param>
+            <param name="predicate">A function to test each <see cref="T:Microsoft.AspNet.WebHooks.WebHook"/> to see whether it fulfills the condition. The
+            predicate is passed the <see cref="T:Microsoft.AspNet.WebHooks.WebHook"/> and the user who registered it. If the predicate returns <c>true</c> then
+            the <see cref="T:Microsoft.AspNet.WebHooks.WebHook"/> is included; otherwise it is not.</param>
+            <returns>The number of <see cref="T:Microsoft.AspNet.WebHooks.WebHook"/> instances that were selected and subsequently notified about the actions.</returns>
+        </member>
+        <member name="M:System.Web.Mvc.ControllerExtensions.NotifyAllAsync(System.Web.Mvc.Controller,Microsoft.AspNet.WebHooks.NotificationDictionary[])">
+            <summary>
+            Submits a notification to all matching registered WebHooks across all users. To match, the <see cref="T:Microsoft.AspNet.WebHooks.WebHook"/> must 
+            have a filter that matches one or more of the actions provided for the notification.
+            </summary>
+            <param name="controller">The <see cref="T:System.Web.Mvc.Controller"/> instance.</param>
+            <param name="notifications">The set of notifications to include in the WebHook.</param>
+            <returns>The number of <see cref="T:Microsoft.AspNet.WebHooks.WebHook"/> instances that were selected and subsequently notified about the actions.</returns>
+        </member>
+        <member name="M:System.Web.Mvc.ControllerExtensions.NotifyAllAsync(System.Web.Mvc.Controller,System.Collections.Generic.IEnumerable{Microsoft.AspNet.WebHooks.NotificationDictionary},System.Func{Microsoft.AspNet.WebHooks.WebHook,System.String,System.Boolean})">
+            <summary>
+            Submits a notification to all matching registered WebHooks across all users. To match, the <see cref="T:Microsoft.AspNet.WebHooks.WebHook"/> must 
+            have a filter that matches one or more of the actions provided for the notification.
+            </summary>
+            <param name="controller">The <see cref="T:System.Web.Mvc.Controller"/> instance.</param>
+            <param name="notifications">The set of notifications to include in the WebHook.</param>
+            <param name="predicate">A function to test each <see cref="T:Microsoft.AspNet.WebHooks.WebHook"/> to see whether it fulfills the condition. The
+            predicate is passed the <see cref="T:Microsoft.AspNet.WebHooks.WebHook"/> and the user who registered it. If the predicate returns <c>true</c> then
+            the <see cref="T:Microsoft.AspNet.WebHooks.WebHook"/> is included; otherwise it is not.</param>
+            <returns>The number of <see cref="T:Microsoft.AspNet.WebHooks.WebHook"/> instances that were selected and subsequently notified about the actions.</returns>
+        </member>
+        <member name="T:System.Web.Mvc.DependencyResolverExtensions">
+            <summary>
+            Extension methods for <see cref="T:System.Web.Mvc.IDependencyResolver"/> facilitating getting the services used by custom WebHooks.
+            </summary>
+        </member>
+        <member name="M:System.Web.Mvc.DependencyResolverExtensions.GetLogger(System.Web.Mvc.IDependencyResolver)">
+            <summary>
+            Gets an <see cref="T:Microsoft.AspNet.WebHooks.Diagnostics.ILogger"/> implementation registered with the Dependency Injection engine
+            or a default <see cref="T:System.Diagnostics.Trace"/> implementation if none are registered.
+            </summary>
+            <param name="services">The <see cref="T:System.Web.Mvc.IDependencyResolver"/> implementation.</param>
+            <returns>The registered <see cref="T:Microsoft.AspNet.WebHooks.Diagnostics.ILogger"/> instance or a default implementation if none are registered.</returns>
+        </member>
+        <member name="M:System.Web.Mvc.DependencyResolverExtensions.GetSettings(System.Web.Mvc.IDependencyResolver)">
+            <summary>
+            Gets a <see cref="T:Microsoft.AspNet.WebHooks.Config.SettingsDictionary"/> instance registered with the Dependency Injection engine
+            or a default implementation based on application settings if none are registered.
+            </summary>
+            <param name="services">The <see cref="T:System.Web.Mvc.IDependencyResolver"/> implementation.</param>
+            <returns>The registered <see cref="T:Microsoft.AspNet.WebHooks.Config.SettingsDictionary"/> instance or a default implementation if none are registered.</returns>
+        </member>
+        <member name="M:System.Web.Mvc.DependencyResolverExtensions.GetFilterManager(System.Web.Mvc.IDependencyResolver)">
+            <summary>
+            Gets an <see cref="T:Microsoft.AspNet.WebHooks.IWebHookFilterManager"/> implementation registered with the Dependency Injection engine
+            or a default implementation if none are registered.
+            </summary>
+            <param name="services">The <see cref="T:System.Web.Mvc.IDependencyResolver"/> implementation.</param>
+            <returns>The registered <see cref="T:Microsoft.AspNet.WebHooks.IWebHookFilterManager"/> instance or a default implementation if none are registered.</returns>
+        </member>
+        <member name="M:System.Web.Mvc.DependencyResolverExtensions.GetSender(System.Web.Mvc.IDependencyResolver)">
+            <summary>
+            Gets an <see cref="T:Microsoft.AspNet.WebHooks.IWebHookSender"/> implementation registered with the Dependency Injection engine
+            or a default implementation if none are registered.
+            </summary>
+            <param name="services">The <see cref="T:System.Web.Mvc.IDependencyResolver"/> implementation.</param>
+            <returns>The registered <see cref="T:Microsoft.AspNet.WebHooks.IWebHookSender"/> instance or a default implementation if none are registered.</returns>
+        </member>
+        <member name="M:System.Web.Mvc.DependencyResolverExtensions.GetManager(System.Web.Mvc.IDependencyResolver)">
+            <summary>
+            Gets an <see cref="T:Microsoft.AspNet.WebHooks.IWebHookManager"/> implementation registered with the Dependency Injection engine
+            or a default implementation if none are registered.
+            </summary>
+            <param name="services">The <see cref="T:System.Web.Mvc.IDependencyResolver"/> implementation.</param>
+            <returns>The registered <see cref="T:Microsoft.AspNet.WebHooks.IWebHookManager"/> instance or a default implementation if none are registered.</returns>
+        </member>
+        <member name="M:System.Web.Mvc.DependencyResolverExtensions.GetStore(System.Web.Mvc.IDependencyResolver)">
+            <summary>
+            Gets an <see cref="T:Microsoft.AspNet.WebHooks.IWebHookStore"/> implementation registered with the Dependency Injection engine
+            or a default implementation if none are registered.
+            </summary>
+            <param name="services">The <see cref="T:System.Web.Mvc.IDependencyResolver"/> implementation.</param>
+            <returns>An <see cref="T:System.Collections.Generic.IEnumerable`1"/> containing the registered instances.</returns>
+        </member>
+        <member name="M:System.Web.Mvc.DependencyResolverExtensions.GetUser(System.Web.Mvc.IDependencyResolver)">
+            <summary>
+            Gets an <see cref="T:Microsoft.AspNet.WebHooks.IWebHookUser"/> implementation registered with the Dependency Injection engine
+            or a default implementation if none are registered.
+            </summary>
+            <param name="services">The <see cref="T:System.Web.Mvc.IDependencyResolver"/> implementation.</param>
+            <returns>The registered <see cref="T:Microsoft.AspNet.WebHooks.IWebHookUser"/> instance or a default implementation if none are registered.</returns>
+        </member>
+        <member name="M:System.Web.Mvc.DependencyResolverExtensions.GetFilterProviders(System.Web.Mvc.IDependencyResolver)">
+            <summary>
+            Gets the set of <see cref="T:Microsoft.AspNet.WebHooks.IWebHookFilterProvider"/> instances registered with the Dependency Injection engine
+            or an empty collection if none are registered.
+            </summary>
+            <param name="services">The <see cref="T:System.Web.Mvc.IDependencyResolver"/> implementation.</param>
+            <returns>An <see cref="T:System.Collections.Generic.IEnumerable`1"/> containing the registered instances.</returns>
+        </member>
+    </members>
+</doc>
