@@ -8,7 +8,7 @@ properties {
     $publish_dir = "$build_dir\publish"
 
     # files
-    $global_assembly_info_file = "$base_dir\src\CommonAssemblyInfo.cs"
+    $global_assembly_info_file = "$base_dir\CommonAssemblyInfo.cs"
 	
 	# build/deployment settings
 	$solution_file = "$base_dir\TestListener.sln"
