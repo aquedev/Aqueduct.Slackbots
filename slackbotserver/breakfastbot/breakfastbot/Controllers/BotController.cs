@@ -47,16 +47,16 @@ namespace AqueductSlackbot.Controllers
             using (var stream =
                 new System.IO.FileStream(path + "client_secret.json", FileMode.Open, FileAccess.Read))
             {
-                string credPath = System.Environment.GetFolderPath(
-                    System.Environment.SpecialFolder.Personal);
-                credPath = Path.Combine(credPath, ".credentials/sheets.googleapis.com-dotnet-quickstart.json");
+                //string credPath = System.Environment.GetFolderPath(
+                    //System.Environment.SpecialFolder.Personal);
+                //credPath = Path.Combine(credPath, ".credentials/sheets.googleapis.com-dotnet-quickstart.json");
                 credential = GoogleWebAuthorizationBroker.AuthorizeAsync(
                     GoogleClientSecrets.Load(stream).Secrets,
                     scopes,
                     "user",
                     CancellationToken.None,
-                    new FileDataStore(credPath, true)).Result;
-                Console.WriteLine("Credential file saved to: " + credPath);
+                    new FileDataStore("C:/.credentials/sheets.googleapis.com-dotnet-quickstart.json", true)).Result;
+                Console.WriteLine("Credential file saved to: " + "C:/.credentials/sheets.googleapis.com-dotnet-quickstart.json");
             }
             service = new SheetsService(new BaseClientService.Initializer()
             {
@@ -90,12 +90,12 @@ namespace AqueductSlackbot.Controllers
             }
 
             client.PostMessage(text: "Process: Start!",
-                       channel: "#general");
+                       channel: "#breakfastmeet");
 
             foreach (var dev in temp)
             {
                 client.PostMessage(text: "@" + temp[i].slackname + " can you make it for breakfast",
-                       channel: "@slash");
+                       channel: "@hannes");
                 i++;
             }
            
