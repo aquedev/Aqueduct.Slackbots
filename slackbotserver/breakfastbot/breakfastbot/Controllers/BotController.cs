@@ -38,7 +38,7 @@ namespace AqueductSlackbot.Controllers
             string[] done = new string[2];
             string name;
             int i = 0;
-            string path = "C:/Users/Hannes Duncan/Documents/Visual Studio 2015/Projects/breakfastbot/breakfastbot/";
+            string path = AppDomain.CurrentDomain.BaseDirectory;
             UserCredential credential;
             SlackSend client = new SlackSend(urlWithAccessToken);
             //fetch list of devs
@@ -47,16 +47,13 @@ namespace AqueductSlackbot.Controllers
             using (var stream =
                 new System.IO.FileStream(path + "client_secret.json", FileMode.Open, FileAccess.Read))
             {
-                //string credPath = System.Environment.GetFolderPath(
-                    //System.Environment.SpecialFolder.Personal);
-                //credPath = Path.Combine(credPath, ".credentials/sheets.googleapis.com-dotnet-quickstart.json");
+                string credPath = Path.Combine(path, ".credentials/sheets.googleapis.com-dotnet-quickstart.json");
                 credential = GoogleWebAuthorizationBroker.AuthorizeAsync(
                     GoogleClientSecrets.Load(stream).Secrets,
                     scopes,
                     "user",
                     CancellationToken.None,
-                    new FileDataStore("C:/.credentials/sheets.googleapis.com-dotnet-quickstart.json", true)).Result;
-                Console.WriteLine("Credential file saved to: " + "C:/.credentials/sheets.googleapis.com-dotnet-quickstart.json");
+                    new FileDataStore(credPath, true)).Result;
             }
             service = new SheetsService(new BaseClientService.Initializer()
             {
