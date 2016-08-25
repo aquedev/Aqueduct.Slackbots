@@ -26,7 +26,7 @@ namespace AqueductSlackbot.Controllers
         private static List<developers> breaklist = new List<developers>();
         private static List<developers> temp = new List<developers>();
         private static string applicationName = "breakfastbot";
-        private string urlWithAccessToken = "https://hooks.slack.com/services/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";
+        private string urlWithAccessToken = "https://hooks.slack.com/services/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";
         private IList<IList<object>> values;
         private string spreadsheetId = "1YMLuQ1tJnTJs1FQN0yruMHAS41nIRm1FHT87pP3GCV0";
         private string range = "Sheet1!A2:D";
