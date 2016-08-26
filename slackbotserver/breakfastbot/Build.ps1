@@ -14,7 +14,7 @@ properties {
 	$solution_file = "$base_dir\Breakfastbot.sln"
     $build_configuration = "Release"
     $build_target = "Rebuild"
-    $build_verbosity = "Minimal"
+    $build_verbosity = "diag"
     $version_major = 1
     $version_minor = 0
 }
